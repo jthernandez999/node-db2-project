@@ -15,17 +15,21 @@ const getById = id => {
 //     .insert(car)
 //     .then(([id]) => getById(id))
 // }
-const create = async(car) => {
-  const [id] = await db('cars')
-  .insert(car)
-  return getById(id)
+const create = (car) => {
+
+  return db('cars')
+    .insert(car)
+      .then(([id]) => {
+        return getById(id)
+      })
+
 }
 
 const updateById = async (id, car) => {
   await db('cars')
     .where('id', id)
     .update(car)
-    return getById(id)
+  return getById(id)
 }
 
 const deleteById = id => {
@@ -34,10 +38,15 @@ const deleteById = id => {
     .del()
 }
 
+const getByVin = (vin) => {
+  return db('cars').where('vin', vin).first()
+}
+
 module.exports = {
-  getAll, 
-  getById, 
+  getAll,
+  getById,
   create,
   deleteById,
   updateById,
+  getByVin,
 }

@@ -38,31 +38,40 @@ const checkCarPayload = (req, res, next) => {
   }
 }
 
-const checkVinNumberValid = async(req, res, next) => {
-  const { vin } = req.body
-  const validated = await vinValidator.validate(vin)
-    if (validated) {
-      next()
-    } else {
-      next({
-        status: 400, 
-        message: `${vin} is invalid`
-      })
-    }
+const checkVinNumberValid = (req, res, next) => {
+if (vinValidator.validate(req.body.vin)) {
+  next()
+} else {
+  next({
+    status: 400, 
+    message: `vin ${req.body.vin} is invalid`,
+  })
 }
+}
+
+// const checkVinNumberValid = async(req, res, next) => {
+//   const { vin } = req.body
+//   const validated = await vinValidator.validate(vin)
+//     if (validated) {
+//       next()
+//     } else {
+//       next({
+//         status: 400, 
+//         message: `${vin} is invalid`
+//       })
+//     }
+// }
 
 const checkVinNumberUnique = async (req, res, next) => {
   try {
-    const existing = await db('cars')
-      .where('vin', req.body.vin.trim())
-      .first()
-    if(existing) {
+    const existing = await Cars.getByVin(req.body.vin)
+    if(!existing) {
+    next()
+    } else {
       next({
         status: 400, 
-        message: `vin ${vin} already exists`
+        message: `vin ${req.body.vin} already exists`,
       })
-    } else {
-      next()
     }
   } catch(err){
     next(err)
